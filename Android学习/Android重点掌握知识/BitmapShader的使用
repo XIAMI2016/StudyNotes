@@ -1,0 +1,500 @@
+#BitmapShader的使用
+
+###BitmapShader构造函数
+
+BitmapShader(Bitmap bitmap,TilemMode tilex,TileMode tiley)
+
+- Bitmap
+- TileMode
+    + CLAMP 拉伸 拉伸的是图片最后的那一个像素；
+    + REPEAT 重复 就是横向、纵向不断重复这个bitmap
+    + MIRROR 镜像 横向不断翻转重复，纵向不断翻转重复；
+
+###BitmapShader演练
+```java
+public class TestImageView extends ImageView {
+
+    /**
+     * 图片的类型，圆形or圆角
+     */
+    private int type;
+    private static final int TYPE_CIRCLE = 0;
+    private static final int TYPE_ROUND = 1;
+
+    /**
+     * 圆角大小的默认值
+     */
+    private static final int BODER_RADIUS_DEFAULT = 10;
+    /**
+     * 圆角的大小
+     */
+    private int mBorderRadius;
+
+    /**
+     * 绘图的Paint
+     */
+    private Paint mBitmapPaint;
+    /**
+     * 圆角的半径
+     */
+    private int mRadius;
+    /**
+     * 3x3 矩阵，主要用于缩小放大
+     */
+    private Matrix mMatrix;
+    /**
+     * 渲染图像，使用图像为绘制图形着色
+     */
+    private BitmapShader mBitmapShader;
+
+    /**
+     * view的宽度
+     */
+    private int mWidth;
+    private RectF mRoundRect;
+
+    public TestImageView(Context context) {
+        this(context,null);
+    }
+
+    public TestImageView(Context context, AttributeSet attrs) {
+        this(context, attrs,0);
+    }
+
+    public TestImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context,attrs);
+    }
+
+    private void init(Context context, AttributeSet attrs) {
+        mMatrix = new Matrix();
+        mBitmapPaint = new Paint();
+        mBitmapPaint.setAntiAlias(true);
+
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RoundImageView);
+
+        //尺寸转换工具，第一个参数：单位dp，第二个参数：数值，第三个参数：转换比（屏幕分辨率）
+        int dimension =(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, BODER_RADIUS_DEFAULT,
+                getResources().getDisplayMetrics());
+
+        mBorderRadius = typedArray.getDimensionPixelSize(R.styleable.RoundImageView_borderRadius, dimension);
+
+        // 默认为Circle
+        type = typedArray.getInt(R.styleable.RoundImageView_type, TYPE_CIRCLE);
+
+        typedArray.recycle();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        /**
+         * 如果类型是圆形，则强制改变view的宽高一致，以小值为准
+         */
+        if (type == TYPE_CIRCLE)
+        {
+            mWidth = Math.min(getMeasuredWidth(), getMeasuredHeight());
+            mRadius = mWidth / 2;
+            setMeasuredDimension(mWidth, mWidth);
+        }
+    }
+
+
+    /**
+     * 初始化BitmapShader
+     */
+    private void setUpShader() {
+        Drawable drawable = getDrawable();
+        if (drawable == null)
+        {
+            return;
+        }
+
+        Bitmap bmp = drawableToBitamp(drawable);
+        // 将bmp作为着色器，就是在指定区域内绘制bmp
+        mBitmapShader = new BitmapShader(bmp, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        float scale = 1.0f;
+        if (type == TYPE_CIRCLE)
+        {
+            // 拿到bitmap宽或高的小值
+            int bSize = Math.min(bmp.getWidth(), bmp.getHeight());
+            scale = mWidth * 1.0f / bSize;
+
+        } else if (type == TYPE_ROUND)
+        {
+            // 如果图片的宽或者高与view的宽高不匹配，计算出需要缩放的比例；缩放后的图片的宽高，一定要大于我们view的宽高；所以我们这里取大值；
+            scale = Math.max(getWidth() * 1.0f / bmp.getWidth(), getHeight()
+                    * 1.0f / bmp.getHeight());
+        }
+        // shader的变换矩阵，我们这里主要用于放大或者缩小
+        mMatrix.setScale(scale, scale);
+        // 设置变换矩阵
+        mBitmapShader.setLocalMatrix(mMatrix);
+        // 设置shader
+        mBitmapPaint.setShader(mBitmapShader);
+    }
+
+
+    /**
+     * 外部设置圆角的方法
+     * @param borderRadius
+     */
+    public void setBorderRadius(int borderRadius)
+    {
+        int pxVal = dp2px(borderRadius);
+        if (this.mBorderRadius != pxVal)
+        {
+            this.mBorderRadius = pxVal;
+            invalidate();
+        }
+    }
+
+    
+    public void setType(int type)
+    {
+        if (this.type != type)
+        {
+            this.type = type;
+            if (this.type != TYPE_ROUND && this.type != TYPE_CIRCLE)
+            {
+                this.type = TYPE_CIRCLE;
+            }
+            requestLayout();
+        }
+
+    }
+
+    /*************状态存储************/
+
+    private static final String STATE_INSTANCE = "state_instance";
+    private static final String STATE_TYPE = "state_type";
+    private static final String STATE_BORDER_RADIUS = "state_border_radius";
+
+    @Override
+    protected Parcelable onSaveInstanceState()
+    {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(STATE_INSTANCE, super.onSaveInstanceState());
+        bundle.putInt(STATE_TYPE, type);
+        bundle.putInt(STATE_BORDER_RADIUS, mBorderRadius);
+        return bundle;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state)
+    {
+        if (state instanceof Bundle)
+        {
+            Bundle bundle = (Bundle) state;
+            super.onRestoreInstanceState(((Bundle) state)
+                    .getParcelable(STATE_INSTANCE));
+            this.type = bundle.getInt(STATE_TYPE);
+            this.mBorderRadius = bundle.getInt(STATE_BORDER_RADIUS);
+        } else
+        {
+            super.onRestoreInstanceState(state);
+        }
+
+    }
+
+
+    /**
+     * drawable转bitmap
+     *
+     * @param drawable
+     * @return
+     */
+    private Bitmap drawableToBitamp(Drawable drawable)
+    {
+        if (drawable instanceof BitmapDrawable)
+        {
+            BitmapDrawable bd = (BitmapDrawable) drawable;
+            return bd.getBitmap();
+        }
+        int w = drawable.getIntrinsicWidth();
+        int h = drawable.getIntrinsicHeight();
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, w, h);
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+
+    public int dp2px(int dpVal)
+    {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                dpVal, getResources().getDisplayMetrics());
+    }
+}
+```
+###BitmapShader讲解
+```java
+public class ShaderView extends View {
+
+    private static final int RECT_SIZE = 200;// 矩形尺寸的一半
+
+    private Paint mPaint;// 画笔
+
+    private int left, top, right, bottom;// 矩形坐上右下坐标
+
+    public ShaderView(Context context) {
+        this(context,null);
+    }
+
+    public ShaderView(Context context, AttributeSet attrs) {
+        this(context, attrs,0);
+    }
+
+    public ShaderView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        <!-- 1、获取尺寸，设置显示图片尺寸宽度以及显示位置 -->
+        // 获取屏幕尺寸数据
+        int[] screenSize = getScreenWidth((Activity)context);
+        <!-- 1.1获取中间位置，使图片居中显示 -->
+        // 获取屏幕中点坐标
+        int screenX = screenSize[0] / 2;
+        int screenY = screenSize[1] / 2;
+        <!-- 1.2设置图片大小 -->
+        // 计算矩形左上右下坐标值
+        left = screenX - RECT_SIZE;
+        top = screenY - RECT_SIZE;
+        right = screenX + RECT_SIZE;
+        bottom = screenY + RECT_SIZE;
+
+        <!-- 2创建画笔并上好颜色 -->
+        // 实例化画笔
+        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+
+        <!-- 2.1创建bitmap取出颜色 -->
+        // 获取位图
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.b);
+
+        <!-- 2.2用着色器上色 -->
+        // 设置着色器，设置着色器类型
+        mPaint.setShader(new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
+    }
+
+    private int[] getScreenWidth(Activity activity){
+        int[] ints = new int[2];
+        WindowManager wm1 = activity.getWindowManager();
+        ints[0] = wm1.getDefaultDisplay().getWidth();
+        ints[1] = wm1.getDefaultDisplay().getHeight();
+        return ints;
+    }
+
+    <!-- 每次都是通过onDraw方法来重绘控件 -->
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        <!-- 3创建画布，设置大小，用画笔画上颜色 -->
+        // 绘制矩形
+        canvas.drawRect(left, top, right, bottom, mPaint);
+    }
+}
+```
+
+#####BitmapShader讲解2：
+```java
+public class ShaderView extends View {
+
+    private static final int RECT_SIZE = 400;// 矩形尺寸的一半
+
+    private Paint mPaint;// 画笔
+    private float posX, posY;// 触摸点的XY坐标
+
+    private int left, top, right, bottom;// 矩形坐上右下坐标
+    private Paint mStrokePaint;
+
+    public ShaderView(Context context) {
+        this(context,null);
+    }
+
+    public ShaderView(Context context, AttributeSet attrs) {
+        this(context, attrs,0);
+    }
+
+    public ShaderView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        <!-- 初始化画图工具 -->
+        <!-- 1初始化笔刷工具 -->
+        <!-- 1.1边框笔刷 -->
+        mStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        mStrokePaint.setAntiAlias(true);
+        //添加边界，设置笔刷类型为边界，颜色，宽度，
+        mStrokePaint.setColor(0xFF000000);
+        mStrokePaint.setStyle(Paint.Style.STROKE);
+        mStrokePaint.setStrokeWidth(5);
+
+        <!-- 1.2初始化内容工具 -->
+        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        mPaint.setAntiAlias(true);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.b);
+
+        mPaint.setShader(new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
+    }
+
+    private int[] getScreenWidth(Activity activity){
+        int[] ints = new int[2];
+        WindowManager wm1 = activity.getWindowManager();
+        ints[0] = wm1.getDefaultDisplay().getWidth();
+        ints[1] = wm1.getDefaultDisplay().getHeight();
+        return ints;
+    }
+
+    <!-- 重点，2设置笔刷圆心位置 -->
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        /*
+         * 手指移动时获取触摸点坐标并刷新视图
+         */
+        <!-- 2.1通过移动获取坐标位置 -->
+        if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            posX = event.getX();
+            posY = event.getY();
+
+            <!-- 重绘 -->
+            invalidate();
+        }
+        return true;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        <!-- 3画到画布上 -->
+        // 绘制圆和描边
+        canvas.drawCircle(posX,posY,100, mPaint);
+        canvas.drawCircle(posX,posY,100, mStrokePaint);
+    }
+}
+```
+
+-------
+
+###Shader其他子类
+
+#####LinearGradient线性渐变
+```java
+//从left和top开始渐变到right和bottom，使用镜像笔刷类型。
+mPaint.setShader(new LinearGradient(left, top, right, bottom, Color.RED, Color.YELLOW, Shader.TileMode.MIRROR));
+```
+<img src="3">
+
+####SweepGradient扫描渐变
+```java
+SweepGradient(float cx, float cy, int color0, int color1)  
+```
+
+####RadialGradient径向渐变
+```java
+RadialGradient (float centerX, float centerY, float radius, int centerColor, int edgeColor, Shader.TileMode tileMode)  
+
+```
+
+####Bitmap实现倒影效果
+
+```java
+public class ReflectView extends View {
+
+    private Bitmap mSrcBitmap, mRefBitmap;// 位图
+    private PorterDuffXfermode mXfermode;// 混合模式
+    private static final int RECT_SIZE = 200;
+    private int screenX;
+    private int screenY;
+    private Paint mPaint;
+    private int x, y;// 位图起点坐标
+
+    public ReflectView(Context context) {
+        this(context,null);
+    }
+
+    public ReflectView(Context context, AttributeSet attrs) {
+        this(context, attrs,0);
+    }
+
+    public ReflectView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        init(context);
+    }
+
+    private void init(Context context) {
+        <!-- 初始化 -->
+        <!-- 1.1获取正照部分 -->
+        //获取资源图片
+        mSrcBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.c);
+
+        <!-- 1.2创建矩阵，用来对称照片实现倒影效果-->
+        Matrix matrix = new Matrix();
+        matrix.setScale(1F,-1F);
+
+        //利用矩阵实现倒影效果
+        //通过bitmap来创建新的bitmap同时用矩阵做变化
+        mRefBitmap = Bitmap.createBitmap(mSrcBitmap, 0, 0, mSrcBitmap.getWidth(), mSrcBitmap.getHeight(),matrix,true);
+
+        int screenW = getScreenWidth((Activity) context)[0];
+        int screenH = getScreenWidth((Activity) context)[1];
+
+//        x = screenW / 2 - mSrcBitmap.getWidth() / 2;//???
+//        y = screenH / 2 - mSrcBitmap.getHeight() / 2;
+
+        //设置起示位置：
+        x = 0;
+        y = 0;
+
+        //创建画笔，设置线性渐变
+        mPaint = new Paint();
+        mPaint.setShader(new LinearGradient(
+                x,y+mSrcBitmap.getHeight(),x,y+mSrcBitmap.getHeight()+mSrcBitmap.getHeight()/2,
+                0xAA000000,Color.TRANSPARENT, Shader.TileMode.CLAMP));
+
+        //设置蒙版的类型，把底色显示出来
+        mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
+    }
+    
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        //设置底色为黑色
+        canvas.drawColor(Color.BLACK);
+        canvas.drawBitmap(mSrcBitmap, x, y, null);
+        
+        int sc = canvas.saveLayer(x, y + mSrcBitmap.getHeight(), x + mRefBitmap.getWidth(), y + mSrcBitmap.getHeight() * 2, null, Canvas.ALL_SAVE_FLAG);
+
+        canvas.drawBitmap(mRefBitmap, x, y + mSrcBitmap.getHeight(), null);
+
+        mPaint.setXfermode(mXfermode);
+
+        canvas.drawRect(x, y + mSrcBitmap.getHeight(), x + mRefBitmap.getWidth(), y + mSrcBitmap.getHeight() * 2, mPaint);
+
+        mPaint.setXfermode(null);
+
+        canvas.restoreToCount(sc);
+    }
+    private int[] getScreenWidth(Activity activity){
+        int[] ints = new int[2];
+        WindowManager wm1 = activity.getWindowManager();
+        ints[0] = wm1.getDefaultDisplay().getWidth();
+        ints[1] = wm1.getDefaultDisplay().getHeight();
+        return ints;
+    }
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+

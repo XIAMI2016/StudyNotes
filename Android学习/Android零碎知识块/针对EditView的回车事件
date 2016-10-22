@@ -1,0 +1,38 @@
+###针对EditView的回车事件
+
+*实现按下回车键隐藏输入键盘方法：*
+- **第一种：**如果布局是多个EditText 为每一个控件设置android:singleLine=”true”，弹出的软盘输入法中回车键为next，直到最后一个获取焦点后显示为Done，点击Done后，软盘输入键盘便隐藏。
+
+- **第一种：**如果只有一个，将控件设置android:imeOptions=”actionDone”，则不管是不是最后一个EditText，点击回车键即隐藏输入法 
+
+**PS :**
+>把EditText的Ime Options属性设置成不同的值，Enter键上可以显示不同的文字或图案
+	actionNone : 回车键，按下后光标到下一行
+	actionGo ： Go
+	actionSearch ： 一个放大镜
+	actionSend ： Send
+	actionNext ： Next
+	actionDone ： Done，隐藏软键盘，即使不是最后一个文本输入框
+
+-------------------
+
+*监听事件：*
+
+```java
+editView.setOnKeyListener(onKey)
+
+onkey ＝ new OnKeyListener() {  
+  
+@(Android学习笔记)Override  
+public boolean onKey(View v, int keyCode, KeyEvent event) {  
+  
+if(keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN){
+	....
+	
+	return true;
+} 
+  
+return false;  
+  
+}  
+```

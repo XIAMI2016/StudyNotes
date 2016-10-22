@@ -1,0 +1,40 @@
+##启动页重启问题
+
+**问题描述：**
+应用安装后，通过安装界面的打开按钮打开应用，每当应用从后台切换到前台，都会启动欢迎界面。如果是通过点击应用启动，则没有此问题。
+**解决方案：**
+在启动界面的onCreate()方法里添加如下代码：
+
+```java
+if((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0){
+    finish();
+    return;
+}
+```
+
+###拓展内容：
+Activity中经常使用到的FLAG：
+
+**Intent.FLAG_ACTIVITY_NEW_TASK**
+
+>默认的跳转类型,会重新创建一个新的Activity，不过与这种情况，比方说Task1中有A,B,C三个Activity,此时在C中启动D的话，如果在Manifest.xml文件中给D添加了Affinity的值和Task中的不一样的话，则会在新标记的Affinity所存在的Task中压入这个Activity。如果是默认的或者指定的Affinity和Task一样的话，就和标准模式一样了启动一个新的Activity.
+
+  **FLAG_ACTIVITY_SINGLE_TOP**
+
+> 这个FLAG就相当于加载模式中的singletop，比如说原来栈中情况是A,B,C,D在D中启动D，栈中的情况还是A,B,C,D
+
+ **FLAG_ACTIVITY_CLEAR_TOP**
+
+> 这个FLAG就相当于加载模式中的SingleTask，这种FLAG启动的Activity会把要启动的Activity之上的Activity全部弹出栈空间。类如：原来栈中的情况是A,B,C,D这个时候从D中跳转到B，这个时候栈中的情况就是A,B了
+
+**FLAG_ACTIVITY_BROUGHT_TO_FRONT**
+
+  >比方说我现在有Ａ，在Ａ中启动Ｂ，此时在Ａ中intent中加上这个标记。此时B就是以  FLAG_ACTIVITY_BROUGHT_TO_FRONT 这个启动的，此时在B中再启动C，D（正常启动C,D），如果这个时候在D中再启动B，这个时候最后的栈的情况是 A,C,D,B. 特别注意的是，我上面说的网上人描述的这个FLAG，会很容易让人误解成这样，A,B,C,D都是标准加载，然后我在D中启动A，这个intent加上FLAG_ACTIVITY_BROUGHT_TO_FRONT  ，就会误认为变成B,C,D,A！！其实不是，这个时候应该是A,B,C,D,A.不信的人大家试试看。不过下面这个标记和这个标记就会让大家明白了！
+
+**FLAG_ACTIVITY_REORDER_TO_F`RONT**
+
+ > 就按在 Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT 最后说的，如果在A,B,C,D正常启动的话，不管B有没有用FLAG_ACTIVITY_BROUGHT_TO_FRONT启动，此时在D中启动B的话，还是会变成A,C,D,B的。
+
+**FLAG_ACTIVITY_NO_HISTORY**
+
+>用这个标记顾名思义！ 意思就是说用这个FLAG启动的Activity，一旦推出，他就不会存在于栈中，比方说！原来是A,B,C 这个时候再C中以这个FLAG启动D的 ， D再启动E，这个时候栈中情况为A,B,C,E。

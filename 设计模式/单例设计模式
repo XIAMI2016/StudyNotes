@@ -1,0 +1,54 @@
+@(设计模式)
+
+#单例设计模式
+
+>###单例设计的好处：
+1、某些类创建比较频繁，对于一些大型的对象，这是一笔很大的系统开销。
+2、省去了new操作符，降低了系统内存的使用频率，减轻GC压力。
+3、有些类如交易所的核心交易引擎，控制着交易流程，如果该类可以创建多个的话，系统完全乱了。
+
+###代码示例：
+
+```java
+public class SingletonTest {  
+  
+    private static SingletonTest instance = null;  
+  
+    private SingletonTest() {  
+    }  
+  
+    private static synchronized void syncInit() {  
+        if (instance == null) {  
+            instance = new SingletonTest();  
+        }  
+    }  
+  
+    public static SingletonTest getInstance() {  
+        if (instance == null) {  
+            syncInit();  
+        }  
+        return instance;  
+    }  
+}  
+```
+
+###或：
+```java
+public class SingletonTest {  
+  
+    private static SingletonTest instance = null;  
+  
+    private SingletonTest() {}  
+  
+    public static SingletonTest syncInit() {  
+        if (instance == null) {  
+			synchronized(SingletonTest.class){
+				if(instance == null){
+				      instance = new SingletonTest();  
+				}
+			}
+        }  
+    }  
+    return instance;
+  }  
+```

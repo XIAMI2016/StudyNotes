@@ -1,0 +1,97 @@
+@(设计模式)
+
+#工厂设计模式
+
+作用：就是建立一个工厂类，对实现了同一接口的一些类进行实例的创建。
+
+工厂模式适合：
+     凡是出现了大量的“产品”需要创建，并且具有共同的接口时，可以通过工厂方法模式进行创建。
+
+###静态工厂方法模式
+
+发送短信和邮箱为例：
+```java
+//send 接口
+public interface Sender {  
+    public void Send();  
+} 
+```
+创建实现类：
+**短信：**
+```java
+public class MailSender implements Sender {  
+    @Override  
+    public void Send() {  
+        System.out.println("this is mailsender!");  
+    }  
+}  
+```
+**邮件：**
+```java
+public class SmsSender implements Sender {  
+ 
+    @Override  
+    public void Send() {  
+        System.out.println("this is sms sender!");  
+    }  
+}  
+```
+**创建静态工厂：**
+```java
+public class SendFactory {  
+      
+    public static Sender produceMail(){  
+        return new MailSender();  
+    }  
+      
+    public static Sender produceSms(){  
+        return new SmsSender();  
+    }  
+} 
+```
+
+**最后使用：**
+```java
+public class FactoryTest {   
+
+    public static void main(String[] args) {      
+    
+        Sender sender = SendFactory.produceMail();  
+        sender.Send();  
+    }  
+```
+
+##抽象工厂类
+
+说白了就是给工厂类添加一个接口，使多个工厂关联起来。
+
+添加一个接口：
+```java
+public interface Provider {  
+    public Sender produce();  
+}
+```
+在上面的例子中改为两多个工厂：
+```java
+//发送邮箱的工厂
+public class SendMailFactory implements Provider {  
+      
+    @Override  
+    public Sender produce(){  
+        return new MailSender();  
+    }  
+}
+
+//发送短信的工厂
+public class SendSmsFactory implements Provider{  
+  
+    @Override  
+    public Sender produce() {  
+        return new SmsSender();  
+    }  
+}  
+```
+
+###重点：
+
+**在使用工厂模式时，只需要关心降低耦合度的目的是否达到了**

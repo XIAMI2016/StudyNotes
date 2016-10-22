@@ -1,0 +1,9 @@
+
+#最简单的定位方式
+
+**使用此定位**
+
+>获取IP定位[1]:file:///Users/tangjun/Documents/学习/jar/百度定位
+
+*问题(BUG)*
+>只能在WIFI下能准确定位，开启3G等情况下按SIM卡位置定位

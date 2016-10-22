@@ -1,0 +1,226 @@
+@(WEB)
+
+#WEB基础入门
+
+###HTML
+>是一个纯文本文件，它主要作用就是用来*描述语义*
+
+-------------------------------------------
+###HTML格式(头文件，内容体)
+    ```html
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Examples</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <link href="" rel="stylesheet">
+    </head>
+    <body>
+        <p>内容体<p>
+    </body>
+    </html>
+    ```
+####HTML4.0
+    ```html
+    //文档标题，此标签告知浏览器文档使用哪种HTML规范
+    //一共有六种规范
+    <!DOCYUPE ...>
+    ```
+##### HTML
+ - Strict  //严格规定规范，有些标签不能使用。
+    ```html
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+    ```
+ - Transitional //普通的 
+    ```html
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    ```
+ - Frameset  //框架
+    ```html
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+    ```
+
+##### XHTML1.0(比HTML更加严格)
+ - Strict  
+    ```html
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    ```
+ - Transitional 
+    ```html
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    ```
+ - Frameset
+    ```html
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+    ```
+
+####HTML5
+  >就没有这么多规则，极大的简化了上述写法。
+
+####字符集
+```html
+        //设置格式
+        <meta http-equiv = "Content-Type" content = "text/html;charset = UTF-8"
+    
+        //设置页面描述（搜索引擎可以抓取，搜索引擎优化SEO）
+        <meta name = "Description" content = "内容"/>
+        //设置关键词
+        <meta name = "Keywords" content = "内容,哈哈,等等,"
+```
+
+####标签
+>标签分为两种：容器级、文本级
+
+#####title
+```html
+<title>网页标题</title>
+```
+#####h系列（容器级标签）
+>标题
+>h1~h6
+
+#####em标签(文本级标签)
+>斜体
+
+#####strong标签（文本级标签）
+>粗体
+
+#####span标签
+>没有语义，它的作用就是为了设置单独的样式用的。
+
+#####q标签
+>引用，用来引用别人的话，会自动添加标签（引用简短的文文本）
+
+#####blockquote标签
+>引用，用来引用大段文本，解析出来会自动缩进（引用大段文字）
+
+#####br单标签
+>添加回车<br/>
+
+#####hr单标签
+>添加分割线
+
+#####p标签（文本级标签）
+>段落，*_p标签只能放文字、图片、表单元素_*
+
+#####img标签（自封闭标签）
+>img,单标签, 图片标签<img src = "" />
+
+#####address地址标签
+>给网页添上地址。<address> </address>
+
+- src 为地址，后面接图片
+    + 同级位置 src = "/image.jpg"
+    + 同级文件夹内 src = "/folder/image.jpg"
+    + 上一级文件夹 src ="../image.jpg"(前一级)
+- alt 为替代，后面接文字，当图片无法显示时，显示该文字
+
+#####超链接
+>< a href = “网址”>显示文字<／a>
+>a 为anchor的缩写
+
+- href 地址
+- title 悬停文本
+- target 目标
+    + _blank 跳转到空白页面
+- name、id指定名称（锚点），用于内部跳转（配合href使用）
+    + href =“#”（空锚，直接到首页）
+
+> 其实就是相当于目录跳转
+> 
+> < a  href = "#myname">< / a> 
+> 
+> < a  name = "name"> 标题 < / a> 
+
+#####无序列表列表标签
+>ul-li组合
+```html
+    <ul>
+        <li>列表</li>
+        <li>列表</li>
+        <li>列表</li>
+    </ul>
+```
+
+#####有序列表标签
+>ol-li
+```html
+    <ol>
+        <li>列表</li>
+        <li>列表</li>
+        <li>列表</li>
+    </ol>
+```
+
+#####div块标签（容器级标签）
+>相当于把页面分成几块，
+
+#####table标签
+```html
+    1、<table>…</table>：整个表格以<table>标记开始、</table>标记结束。
+    2、<tbody>…</tbody>：当表格内容非常多时，表格会下载一点显示一点，但如果加上<tbody>标签后，这个表格就要等表格内容全部下载完才会显示。如右侧代码编辑器中的代码。
+    3、<tr>…</tr>：表格的一行，所以有几对tr 表格就有几行。
+    4、<td>…</td>：表格的一个单元格，一行中包含几对<td>...</td>，说明一行中就有几列。
+    5、<th>…</th>：表格的头部的一个单元格，表格表头。
+    6、表格中列的个数，取决于一行中数据单元格的个数
+```
+
+#####表单传输方法(详细看表单输入)
+```html
+<form   method="传送方式"   action="服务器文件">
+
+//例如
+<form   method="post"   action="save.php">
+      <label for="username">用户名:</label>
+      <input type="text"  name="username" id="username" value="" />
+      <label for="pass">密码:</label>
+      <input type="password"  name="pass" id="pass" value="" />    
+      <input type="submit" value="确定"  name="submit" />
+      <input type="reset" value="重置" name="reset" />
+</form>  
+
+／/表单中的label(用来增加用户交互性)
+<label for="控件id名称">
+<form>
+  <label for="male">男</label>
+  <input type="radio" name="gender" id="male" />
+  <br />
+  <label for="female">女</label>
+  <input type="radio" name="gender" id="female" />
+  <label for="email">输入你的邮箱地址</label>
+  <input type="email" id="email" placeholder="Enter email">
+</form>
+```
+>1.< form >标签是成对出现的，以< form >开始，以< / form >结束。
+ 2.action ：浏览者输入的数据被传送到的地方,比如一个PHP页面(save.php)。 3.据传送的方式（get/post）。
+
+>1、type：
+   - 当type="text"时，输入框为文本输入框;
+   - 当type="password"时, 输入框为密码输入框。
+2、name：为文本框命名，以备后台程序ASP 、PHP使用。
+3、value：为文本输入框设置默认值。(一般起到提示作用)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

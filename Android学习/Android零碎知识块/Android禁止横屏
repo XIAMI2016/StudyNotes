@@ -1,0 +1,8 @@
+@(Android零碎知识块)
+
+###Android禁止横屏方法
+
+>**1、**
+让你的所有Activity都继承一个BaseActivity,然后在BaseActivity的onCreate()方法中加上setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+ 
+>**2、**Manifest.xml文件中为所有Activity加上配置属性 android:screenOrientation="portrait"

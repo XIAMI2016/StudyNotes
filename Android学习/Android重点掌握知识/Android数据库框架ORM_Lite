@@ -1,0 +1,251 @@
+@(Android重点掌握知识)
+
+#Android数据库框架－－ORM_Lite
+
+###第一步
+添加库：[ormlite-android-5.0.jar][1]和[ormlite-core-5.0.jar][2]
+
+[复杂条件查询][4]
+
+
+###第二步    配置bean类
+```java
+//首先在User类上添加@DatabaseTable(tableName = "tb_user")，标明这是数据库中的一张表，表名为tb_user
+
+DatabaseTable(tableName = "tb_user")  
+public class User  
+{  
+//@DatabaseField(generatedId = true) ，generatedId 表示id为主键且自动生成。
+//然后分别在属性上添加@DatabaseField(columnName = "name") ，columnName的值为该字段在数据中的列名。
+
+    //@DatabaseField(generatedId = true)
+    @DatabaseField(id = true)   //这样使其变成主键，主键内容需要自己添加
+    private int id; 
+    @DatabaseField(columnName = "name")  
+    private String name;  
+    @DatabaseField(columnName = "desc")  
+    private String desc;  
+  
+    public User()  
+    {  
+    }  
+  
+    public User(String name, String desc)  
+    {  
+        this.name = name;  
+        this.desc = desc;  
+    }  
+} 
+```
+
+###第三步		编写dao类
+```java
+public class DatabaseHelper extends OrmLiteSqliteOpenHelper  
+{  
+  
+    private static final String TABLE_NAME = "sqlite-test.db";  
+    /** 
+     * userDao ，每张表对应一个
+     */  
+    private Dao<User, Integer> userDao;  
+  
+    private DatabaseHelper(Context context)  
+    {  
+        super(context, TABLE_NAME, null, 2);  
+    }  
+  
+    @Override  
+    public void onCreate(SQLiteDatabase database,  
+            ConnectionSource connectionSource)  
+    {  
+        try  
+        {  
+            TableUtils.createTable(connectionSource, User.class);  
+        } catch (SQLException e)  
+        {  
+            e.printStackTrace();  
+        }  
+    }  
+  
+    @Override  
+    public void onUpgrade(SQLiteDatabase database,  
+            ConnectionSource connectionSource, int oldVersion, int newVersion)  
+    {  
+        try  
+        {  
+	        //允许忽视错误truessts
+            TableUtils.dropTable(connectionSource, User.class, true);  
+            onCreate(database, connectionSource);  
+        } catch (SQLException e)  
+        {  
+            e.printStackTrace();  
+        }  
+    }  
+  
+    private static DatabaseHelper instance;  
+  
+    /** 
+     * 单例获取该Helper 
+     *  
+     * @param context 
+     * @return 
+     */  
+    public static synchronized DatabaseHelper getHelper(Context context)  
+    {  
+        if (instance == null)  
+        {  
+            synchronized (DatabaseHelper.class)  
+            {  
+                if (instance == null)  
+                    instance = new DatabaseHelper(context);  
+            }  
+        }  
+  
+        return instance;  
+    }  
+  
+    /** 
+     * 获得userDao 
+     *  
+     * @return 
+     * @throws SQLException 
+     */  
+    public Dao<User, Integer> getUserDao() throws SQLException  
+    {  
+        if (userDao == null)  
+        {  
+            userDao = getDao(User.class);  
+        }  
+        return userDao;  
+    }  
+  
+    /** 
+     * 释放资源 
+     */  
+    @Override  
+    public void close()  
+    {  
+        super.close();  
+        userDao = null;  
+    }  
+  
+} 
+```
+
+###创建dao类: 
+利用这个类来实现增删改查，同时对数据进行处理
+```java
+public class UserDao {
+
+    private Context context;
+
+    public UserDao(Context context) {
+        this.context = context;
+    }
+
+    public void add(UserBean user){
+        try {
+            UserDataHelper.getHelper(context).getUserDao().create(user);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int deleteById(int id) throws SQLException {
+        return UserDataHelper.getHelper(context).getUserDao().deleteById(id);
+    }
+
+    public int deleteByName(String name){
+        int delete = 0;
+        try {
+            DeleteBuilder<UserBean, Integer> deleteBuilder = UserDataHelper.getHelper(context).getUserDao().deleteBuilder();
+            deleteBuilder.where().eq("user_name",name);
+
+            delete = deleteBuilder.delete();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            return delete;
+        }
+    }
+
+    public String getNameForID(int id){
+        String name = "";
+        try {
+            UserBean userBean = UserDataHelper.getHelper(context).getUserDao().queryForId(id);
+            name = userBean.getUser_name();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            return name;
+        }
+    }
+
+    public List<UserBean> getAll(){
+        List list = new ArrayList();
+        try {
+            list.addAll( UserDataHelper.getHelper(context).getUserDao().queryForAll());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+}
+```
+
+### 外键的引入
+```java
+@(Android学习笔记)
+public class ArticleBean {
+
+    @DatabaseField(columnName = "article_id")
+    private int id;
+
+    @DatabaseField(columnName = "title")
+    private String title;
+	
+	//不会去定义一个int类型的userId，而是直接定义一个User成员变量，表示本Article属于该User
+    @DatabaseField(canBeNull = true,foreign = true,columnName = "user_id")
+    private UserBean user;
+
+    public ArticleBean() {}
+
+    public ArticleBean(int id, String title, UserBean user){
+        this.id = id;
+        this.title = title;
+        this.user = user;
+    }
+}
+```
+
+###关联一个集合
+```java
+//关联一个集合，只能使用collection或ForeignCollection类
+//因为比较常见的是涉及到gson，使用collection类
+@ForeignCollectionField(eager = true)
+private Collection<CityArrayBean> CityArray;
+```
+
+### 常用注解参数：
+| 成员名       |  数据类型  | 描述  |
+| :--------:  | :--------: | :--: |
+| columnName  | String    | 数据库的列名。					|
+| foreign	  |	Boolen	  |	外键的引入，直接定义在指引的对象上，columnName 的值为所指引的主键|
+| dataType	  | 自动获取	  |	字段的数据类型 				|
+| canBeNull	  | Boolean	  |字段是否能被分配null值。默认是true。|
+| id		  |	Boolean	  |这个字段是否是主键，默认是false。	|
+|eager		  |Boolean    |给关联集合使用，当为true时，可以让主数据库直接查询到外键|
+|generatedId  | Boolean	  | 字段是否自动增加。默认为false。 自动变成主键|
+
+
+###注意事项：
+> 
+- Bean类：需要添加一个无参构造函数
+- 关联集合：添加集合内容的时候是在外键的数据库里面添加，然后按外键的方式指向主集合
+- ORMLITE与greenDAO的使用：一般需求的话使用ormLite就好了，简单方便。涉及到大的数据库类型可以使用[greenDao][3]。
+
+[1]:http://ormlite.com/releases/
+[2]:http://ormlite.com/releases/
+[3]:http://blog.csdn.net/wl1769127285/article/details/52369516
+[4]:http://blog.csdn.net/industriously/article/details/50790624

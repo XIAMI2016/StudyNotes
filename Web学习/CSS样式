@@ -1,0 +1,422 @@
+#CSS样式
+
+>CSS全称为“层叠样式表 (Cascading Style Sheets)”，它主要是用于定义HTML内容在浏览器内的显示样式，如文字大小、颜色、字体加粗等。
+
+###CSS三种写入方式
+- 内联式 
+    ```html
+    css样式表就是把css代码直接写在现有的HTML标签中
+    <p style="color:red">这里文字是红色。</p>
+    ```
+- 嵌入式
+    ```html
+    <style type="text/css"></style>标签之间
+    ```
+- 外联式
+    ```html
+    <link href="base.css" rel="stylesheet" type="text/css" />
+    注意：
+    1、css样式文件名称以有意义的英文字母命名，如 main.css。
+    2、rel="stylesheet" type="text/css" 是固定写法不可修改。
+    3、<link>标签位置一般写在<head>标签之内。
+    ```
+
+#####三种优先级关系
+>在同一权重下，就近原则（离被设置元素越近优先级别越高）。
+所以，一般为：内联式 > 嵌入式 > 外部式
+当link标签写在style后面则为：内联式 > 外部式 > 嵌入式 
+
+*注意：css样式也有就近原则，先调用的css样式，会被后调用的样式取代掉。*
+
+###CSS声明写法
+>选择器{
+>       样式;
+>    }
+
+####标签选择器
+>标签选择器其实就是html代码中的标签,
+给标签定义了样式
+
+```html
+    p{
+        font-size: 12px;
+        line-height: 1.0em;
+    }
+```
+
+####类选择器
+>类选择器是通过“.”加类名，然后在定义样式
+显示方式是在标签内部，添加一个类名，来与之对应
+
+```html
+    .red_class{
+            color: red;
+        }
+
+    <p class="red_class">有些中文字可以从表面、部首、字旁看到一些联系旁通的字义。而这些特色是拼音文字所没有的。所以古代中国文字在不同的语系区域是拥有不同发音的，即方言的存在。</p>
+```
+
+####id选择器
+>类选择器是通过“.”加类名，然后在定义样式
+显示方式是在标签内部，添加一个类名，来与之对应
+
+*注意与类标签不同，这里是用“#”来标示的*
+
+```html
+    #blue_class{
+            color: red;
+        }
+
+    <p id="blue_class">有些中文字可以从表面、部首、字旁看到一些联系旁通的字义。而这些特色是拼音文字所没有的。所以古代中国文字在不同的语系区域是拥有不同发音的，即方言的存在。</p>
+```
+
+####id选择器与类选择器的区别
+- 相同点：可以应用于任何元素
+- 不同点
+    + 1、id选择器只能在文档中使用一次。每个id都是独一无二的
+    + 2、class选择器词，可以写多个，同时作用于一个元素，即设置多个样式。当多个样式都修改同一个属性时，采用就近原则。
+
+如：
+
+```html
+    <p class="red_class max_height">有些中文字可以从表面、部首、字旁看到一些联系旁通的字义。而这些特色是拼音文字所没有的。所以古代中国文字在不同的语系区域是拥有不同发音的，即方言的存在。</p>
+```
+
+####子类选择器
+>其实就相当于给标签里面的标签添加属性。
+
+```html
+ .red_class {
+        color: red;
+    }
+
+ <!- 注意border属性的写法，容易错->
+ .red_class > span {
+        border: 2px solid green;
+    }
+
+ <p class="red_class max_height">有些中文字可以从<span>表面、部首、字旁</span>看到一些联系旁通的字义。而这些特色是拼音文字所没有的。所以古代中国文字在不同的语系区域是拥有不同发音的，即方言的存在。</p>
+``` 
+
+*注意：* 这里是给说明，给类名叫first的标签里面的标签span添加属性。_但是不能给子类的子类附上该属性了,只能给直接后代。_
+
+####后代选择器
+>与子类选择器不同，这是给其所有后代赋值。
+
+```html
+  .first span {
+        border: 10px solid black;
+    }
+
+    <div class="first">
+        <p>原始文字是人类用来纪录特定<span>事物、简化</span>图像而成的书写符号。文字在发展早期都是图画形式的表意文字（象形文字），与语音无甚关系，中国文字便是从此渐次演变而成。</p>
+        <p class="red_class max_height">有些中文字可以从<span>表面、部首、字旁</span>看到一些联系旁通的字义。而这些特色是拼音文字所没有的。所以古代中国文字在不同的语系区域是拥有不同发音的，即方言的存在。</p>
+        <p id="blue_id">汉朝已经被<span>邻近的</span>族群借用其文字用作为书写纪录。</p>
+    </div>
+```
+
+####通用选择器
+>可以作为所有标签元素，
+
+```html
+  * {
+        border: 10px solid black;
+    }
+
+    <div class="first">
+        <p>原始文字是人类用来纪录特定<span>事物、简化</span>图像而成的书写符号。文字在发展早期都是图画形式的表意文字（象形文字），与语音无甚关系，中国文字便是从此渐次演变而成。</p>
+        <p class="red_class max_height">有些中文字可以从<span>表面、部首、字旁</span>看到一些联系旁通的字义。而这些特色是拼音文字所没有的。所以古代中国文字在不同的语系区域是拥有不同发音的，即方言的存在。</p>
+        <p id="blue_id">汉朝已经被<span>邻近的</span>族群借用其文字用作为书写纪录。</p>
+    </div>
+```
+
+####伪类选择符
+>比如兼容性最好的a:hover 
+它定义的是鼠标滑过时的标签样式
+
+```html
+    a:hover{
+        color: red;
+    }
+
+        <a href="https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=html%20em">我是a标签</a>
+```
+
+####分组选择符
+>可以为多个标签元素设置同一个样式。
+写成：
+```html
+    a,span{
+        color: red;
+    }
+···
+
+-----
+
+###CSS的继承性
+>有些样式是具有继承性的，它不仅把样式设置给特定的标签还作用于其后的子类
+
+如： color 样式就是具有继承性的
+    border 则不具有继承性
+
+
+###CSS的特殊性
+>CSS样式中有权值的概念，权值越高就越会显示其样式。权值还可以叠加
+
+如：
+- 标签的权值 1
+- 类选择符的权值 10
+- ID选择器的权值 100
+
+```html
+    p {color: red} 权值为1
+
+    p span{color: green} 权值为 1+1 = 2
+
+    .warning{color:white;} 权值为 10
+
+    p span .warning{color: purple;} 权值为 1+1+10 = 12
+
+    #footer .note p{color: yellow;} 权值为 100 +10 +1 = 111
+```
+####CSS的重要性（!important）
+>这个属性有最高权限。
+```html
+p {color :red !important}
+```
+
+###CSS的层叠
+>当在html文件中对与同一个元素有相同的权值时，就会有层叠的概念。
+这时就会按照层叠的顺序执行，也就是就近原则。
+
+----
+
+###文字排版
+>在css样式中可以设置字体，字号，颜色等
+```html
+p { 
+    font-family:"Microsoft Yahei";
+    font-size:12px;
+    font-color:red;
+    font-weight:bold;//粗体
+    font-style:italic;//斜体
+    text-decoration:underlime;//下划线
+    text-decoration:line-through;//删除线
+    text-indent:2em;//缩进
+    line-height:1.5em//行间距
+    letter-spacing:50px;//字间隔
+    text-align:center;//居中（不止是针对文字的，在块状元素中也是用这方法居中）
+}
+```
+
+-----
+
+##CSS盒子模式
+
+###CSS常见元素分类
+
+- 常见的块状元素
+
+```html
+    <div></div>
+    <p></p>
+    <h1></h1>
+    <ol></ol>
+    <ul></ul>
+    <table></table>
+    <address></address>
+    <blockquote></blockquote>
+    <form></form>
+```
+
+- 常用的内联元素
+
+```html
+    <a href=""></a>
+    <span></span>
+    <br>
+    <i></i>
+    <em></em>
+    <strong></strong>
+    <label></label>
+    <q></q>
+    <var></var>
+    <cite></cite>
+    <code></code>
+```
+
+- 常用的内联块状元素
+
+```html
+    <img src="">
+    <input type="" name="">
+```
+
+*块级元素特点：*
+
+- 每个块级元素都从新的一行开始，并且其后的元素也另其一行。
+- 元素都高度、宽度、行高以及顶和底边距都可设置。
+- 元素宽度在不设置的情况下，是它本身父容器的100%（和父元素的宽度一致），除非设定一个宽度。
+
+>除了本身就是块级元素外，还可以通过其他元素转换，如,设置display：block
+
+```html
+a{dispaly:block}
+```
+
+*内联元素：*
+
+- 和其他元素都在一行上
+- 元素的高度，宽度，及顶部和底部边距不可设置
+- 元素的宽度就是它包含的文字或图片等宽度，不可改变
+
+>也可以通过代码来设置为内联元素，如：display：inline
+
+```html
+div{dispaly:inline}
+```
+
+*内联块状元素*
+
+- 可以和其他元素都在一行上
+- 元素都高度，宽度，行高以及顶盒底边都可以设置
+- 可以看成两种元素的组合
+
+>代码表示为：display:inline-block
+
+```html
+a{dispaly:inline-block}
+```
+
+####盒子模型使用：
+>分为边框border,填充padding，外填充margin
+
+关于位置的填充（border、padding、margin都遵循这个规律）：
+```html
+    //上 右 下 左（顺时针顺序）
+div{padding :40px 30px 20px 10px}
+    //上下 左右
+div{padding :40px 30px}
+    //上下左右
+div{padding :40px}
+```
+
+border的书写规则：
+```html
+div{
+        //第一种写法
+        border-width: 5px 4px 3px 2px;//宽度
+        border-style: solid;//类型，边框型
+        border-color: red;//颜色
+
+        //第二种写法
+        border:10px solid red
+}
+```
+
+----
+
+###CSS的三种布局模型
+
+####流式布局Flow
+>流动布局是默认的网页布局，
+
+*特点：*
+- 块状元素都会在自上而下延伸分布。
+- 内联元素会实现自左而右的布局（因为内联元素不会像块状元素一样霸占整屏）
+
+####浮动布局
+>在设置属性中加入：float：left或者float：right就能实现块状元素并排排版
+
+```html
+  #_1 ,#_2{
+        width: 200px;
+        height: 200px;
+        border: 2px solid red;
+        padding: 10px;
+        float: right;
+    }
+```
+
+####层布局
+>层布局可以实现图层的精确定位，但是因为网页的活动性太强，所以用的不多。但是在局部使用的时候还是有用的。
+
+*层布局分为三种：*
+
+- 绝对布局
+- 相对布局
+- 固定布局
+
+#####绝对布局
+>先设置position:absolute这条语句，这条语句执行完毕后，会把元素从文档中拖出来，然后使用left、right、top、buttom属性相对于其最接近的一个具有定位的父包含块进行绝对定位，如果不包含则相对于body元素，即浏览器窗口。
+
+```html
+   #_3{
+        width: 100px;
+        height:100px;
+        border: 1px solid red;
+        position: absolute;
+        left: 200px;
+        top:100px;
+    }
+
+    <div id="_2">
+        //这里不会相对于_2的坐标原点定位，而是相对于body的坐标原点定位
+        <div id="_3"></div>
+    </div>
+
+      <div id="_2" style="position:relative">
+        //当父类设置了相对定位时，子类的绝对定位就会相对于父类的原点坐标定位。
+        <div id="_3"></div>
+    </div>
+```
+
+#####相对布局
+>它是先按float方式生成一个元素，然后相对于以前的位置移动。移动的方向和大小由left、right、top、bottom属性确定的。
+
+```html
+    ._1 ,._2{
+        width: 200px;
+        height: 200px;
+        border: 2px solid red;
+        padding: 10px;
+        float: left;
+    } 
+
+      ._4{
+        position: relative;
+        left: 200px;
+    }
+
+    <div class="_1">栏目1</div>
+    <div class="_2" style="position: relative;">
+         <p>栏目2</p>
+         <div class="_3">
+                <div>子类3</div>
+         </div>
+    </div>  
+    <div class="_2 _4">栏目4</div> 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

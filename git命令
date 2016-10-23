@@ -11,11 +11,24 @@
 命令如下使用：
 git clone https://github.com/XIAMI2016/StudyNotes.git
 
+####忽略一些不要的文件
+>在仓库根目录下创建名称为“.gitignore”的文件，写入不需要的文件夹名或文件，每个元素占一行即可，如
+target //文件名
+bin    //文件夹名
+*.db   //后缀名
+
 ####git add
 >要上传文件，首先需要添加指定需要上传的文件
 命令如下使用：
 git add 文件名 (添加单个文件或文件夹)
 git add *     (添加所以文件)
+
+####git rm 
+>删除文件
+命令如下使用：
+git rm -文件名（从暂存区和工作区中删除）
+git rm -cached 文件名（只从暂存区删除）
+
 
 ####git commit
 >上传已添加的文件，这时代码时保存在本地的。
@@ -27,6 +40,9 @@ git commit -m "代码提交说明"
 命令如下使用：
 *1、当已经克隆了远程的仓库时：git push origin master* ，后面的master是推送主分支的意思
 *2、当没有克隆远程仓库时：git remote add origin https://github.com/XIAMI2016/StudyNotes.git*
+
+###git citool
+>图形化显示界面
 
 -------
 
@@ -70,8 +86,51 @@ git commit -m "代码提交说明"
 然后使用:*git fetch origin* 由本地指向服务器
 最后使用: *git reset --hard origin*   重新获取
 
+----
 
+###远程仓库相关命令使用
+- 检出仓库：   $ git clone git://github.com/jQuery/jquery.git
+- 查看远程仓库：$ git remote -v
+- 添加远程仓库：$ git remote add [name] [url]
+- 删除远程仓库：$ git remote rm [name]
+- 修改远程仓库：$ git remote set-url --push [name] [newUrl]
+- 拉取远程仓库：$ git pull [remoteName] [localBranchName]
+- 推送远程仓库：$ git push [remoteName] [localBranchName]
 
+*如果想把本地的某个分支test提交到远程仓库，并作为远程仓库的master分支，或者作为另外一个名叫test的分支，如下：
+$git push origin test:master         // 提交本地test分支作为远程的master分支
+$git push origin test:test              // 提交本地test分支作为远程的test分支
+
+----
+
+###分支（branch）相关命令使用：
+- 查看本地分支：$ git branch
+- 查看远程分支：$ git branch -r
+- 创建本地分支：$ git branch [name] ----注意新分支创建后不会自动切换为当前分支
+- 切换分支：$ git checkout [name]
+- 创建新分支并立即切换到新分支：$ git checkout -b [name]
+- 删除分支：$ git branch -d [name] ---- -d选项只能删除已经参与了合并的分支，对于未有合并的分支是无法删除的。如果想强制删除一个分支，可以使用-D选项
+- 合并分支：$ git merge [name] ----将名称为[name]的分支与当前分支合并
+- 创建远程分支(本地分支push到远程)：$ git push origin [name]
+- 删除远程分支：$ git push origin :heads/[name] 或 $ gitpush origin :[name] 
+
+*创建空的分支：(执行命令之前记得先提交你当前分支的修改，否则会被强制删干净没得后悔)
+$git symbolic-ref HEAD refs/heads/[name]
+$rm .git/index
+$git clean -fdx
+
+----
+
+###版本（tag）命令相关控制
+- 查看版本：$ git tag
+- 创建版本：$ git tag [name]
+- 删除版本：$ git tag -d [name]
+- 查看远程版本：$ git tag -r
+- 创建远程版本(本地版本push到远程)：$ git push origin [name]
+- 删除远程版本：$ git push origin :refs/tags/[name]
+- 合并远程仓库的tag到本地：$ git pull origin --tags
+- 上传本地tag到远程仓库：$ git push origin --tags
+- 创建带注释的tag：$ git tag -a [name] -m 'yourMessage'
 
 
 

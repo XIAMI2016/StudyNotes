@@ -397,10 +397,62 @@ div{
     </div>  
     <div class="_2 _4">栏目4</div> 
 ```
+#####固定定位
+>fixed:表示固定定位，与absolute定位类型类似。但是它的相对移动的坐标是视图（屏幕内的网页窗口）本身，它是不会随滚动条的滚动而变化
 
+```html
+   #_3{
+        width: 100px;
+        height:100px;
+        border: 1px solid red;
+        position: fixed;
+        left: 200px;
+        top:100px;
+    }
 
+    <div id="_2">
+     
+        <div id="_3"></div>
+    </div>
+```
 
+---
 
+###CSS的其他注意事项：
+
+####颜色值
+>CSS中有两种颜色的表示方法：
+*第一种：RGB颜色* color : rgb(100,100,100)或 color : rgb(50%,50%,25%);
+*第二种: 十六进制颜色* color :#00ffff;
+
+####长度值
+>CSS中也是有两种长度的表示方式：
+*第一种：px* 
+*第二种：em*，这个一般是行高等单位，它取决于该元素的font-size值，如果font-size = 14px。
+则em = 14px。
+
+-----
+
+###设置水平居中问题
+
+####行内元素居中问题：
+>如果被设置的元素是文字、图片等行内元素，我们可以通过父类元素来控制其位置。
+设置其text-alin属性为center
+
+```html
+
+    <style type="text/css">
+        ._center{
+            text-align: center;
+        }
+    </style>
+
+    <div class="_center">
+        行内居中
+    </div>
+```
+
+``
 
 
 

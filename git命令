@@ -1,0 +1,77 @@
+# git命令
+
+###个人使用命令：
+
+####git init
+>在新创建的文件下打开控制台,使用git init创建新仓库。
+如果该文件夹下已经创建了会提示出错。
+
+####git clone
+>当在初始化完成的文件夹下克隆远程仓库。
+命令如下使用：
+git clone https://github.com/XIAMI2016/StudyNotes.git
+
+####git add
+>要上传文件，首先需要添加指定需要上传的文件
+命令如下使用：
+git add 文件名 (添加单个文件或文件夹)
+git add *     (添加所以文件)
+
+####git commit
+>上传已添加的文件，这时代码时保存在本地的。
+命令如下使用：
+git commit -m "代码提交说明"
+
+####git push
+>提交到远程服务器
+命令如下使用：
+*1、当已经克隆了远程的仓库时：git push origin master* ，后面的master是推送主分支的意思
+*2、当没有克隆远程仓库时：git remote add origin https://github.com/XIAMI2016/StudyNotes.git*
+
+-------
+
+###多人使用命令：
+
+####更新与合并（每次编程前第一件事）
+>更新本地仓库至最新改动。合并远程改动
+*git pull*
+
+####添加分支：
+*git checkout -b 分支名称*
+
+####切回主分支：
+*git checkout master*
+
+####合并其他分支到当前分支
+*git merge 分支名称*
+
+####合并之前可以查看分支
+*git diff 源分支 目标分支*
+
+####把新建的分支删除：
+*git branch -d 分支名称*
+
+####如果要把分支推送给远端
+*git push origin 分支名称*
+
+####标签
+>用来指定版本更新
+*git tag 1.0.0 13jhwdlqww (前面为版本号，后面是唯一的标记ID可取其前十位)*
+
+####获取ID
+*git log*
+
+####替换本地改动
+*git checkout --文件名*
+此命令会替换调你本地的文件
+
+####替换全部文件（从服务器中获取）
+首先:删除本地文件
+然后使用:*git fetch origin* 由本地指向服务器
+最后使用: *git reset --hard origin*   重新获取
+
+
+
+
+
+
